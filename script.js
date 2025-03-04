@@ -266,10 +266,18 @@ async function showPosition(position) {
         const reverseGeocodingResponse = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`);
         const reverseGeocodingData = await reverseGeocodingResponse.json();
 
-        let city = reverseGeocodingData.address.city || reverseGeocodingData.address.town || reverseGeocodingData.address.village || 'Unknown Location';
+        let city = reverseGeocodingData.address.city || reverseGeocodingData.address.town || reverseGeocodingData.address.village;
+        if (!city) {
+            // Try to find a nearby larger city
+            city = await findNearbyCity(latitude, longitude);
+            if (!city) {
+                cityName.textContent = `Latitude: ${latitude}, Longitude: ${longitude}`;
+                return;
+            }
+        }
 
         // Update the Google Maps embed URL
-        const mapUrl = `https://maps.google.com/maps?q=${city}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
+        const mapUrl = `https://maps.google.com/maps?q=${city}&t=&z=16&ie=UTF8&iwloc=&output=embed&maptype=satellite`;
         document.getElementById('map').src = mapUrl;
         cityName.textContent = city;
         searchInput.value = city;
@@ -282,6 +290,24 @@ async function showPosition(position) {
     } catch (error) {
         console.error('Error during reverse geocoding:', error);
         cityName.textContent = `Latitude: ${latitude}, Longitude: ${longitude}`;
+    }
+}
+
+async function findNearbyCity(latitude, longitude) {
+    try {
+        // Search for nearby cities using Nominatim API
+        const searchResponse = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&q=[city]&bounded=1&viewbox=${longitude-0.5},${latitude-0.5},${longitude+0.5},${latitude+0.5}`);
+        const searchData = await searchResponse.json();
+
+        if (searchData && searchData.length > 0) {
+            // Return the first city found
+            return searchData[0].display_name.split(',').reverse()[2];
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.error('Error during nearby city search:', error);
+        return null;
     }
 }
 
