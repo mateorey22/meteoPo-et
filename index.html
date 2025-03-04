@@ -1,56 +1,60 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Météo</title>
+    <title>Retro Weather</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
     <div class="container">
-        <h1>Météo</h1>
-        <div class="search-box">
-            <input type="text" placeholder="Rechercher une ville..." id="search-input">
-            <button id="search-button">Rechercher</button>
-        </div>
-        <button id="location-button">Detect Location</button>
-        <iframe id="map"
-            width="600"
-            height="450"
-            style="border:0"
-            loading="lazy"
-            allowfullscreen
-            src="https://maps.google.com/maps?q=Paris&t=&z=13&ie=UTF8&iwloc=&output=embed">
-        </iframe>
-        <div class="weather-info">
-            <h2 id="city-name"></h2>
-            <img id="weather-icon" src="" alt="Weather Icon">
-            <p id="temperature"></p>
-            <p id="description"></p>
-            <p id="humidity"></p>
-            <p id="wind-speed"></p>
-        </div>
-
-        <div class="forecast-info">
-            <h2>Prévisions</h2>
-            <div class="forecast-graphs">
-                <canvas id="temperature-chart"></canvas>
-                <canvas id="humidity-chart"></canvas>
+        <header>
+            <h1>Retro Weather</h1>
+            <div class="search-box">
+                <input type="text" placeholder="Enter city name">
+                <button><i class="fas fa-search"></i> Search</button>
             </div>
-            <div class="daily-forecast" id="daily-forecast-container">
-                <!-- Daily forecast items will be added here -->
-            </div>
-        </div>
+            <button id="get-location"><i class="fas fa-location-arrow"></i> Get My Location</button>
+        </header>
 
-        <div class="gemini-summary">
-            <div class="gemini-animation">
-                <div class="gemini-content" id="gemini-summary-text">
-                    <!-- Gemini summary will be displayed here -->
-                    <button id="gemini-button">Résumé IA</button>
+        <main>
+            <section id="current-weather" class="animated-section">
+                <h2>Current Weather</h2>
+                <div class="weather-info">
+                    <p>Temperature: <span id="temperature"></span></p>
+                    <p>Condition: <span id="condition"></span></p>
+                    <p>Wind Speed: <span id="wind-speed"></span></p>
+                    <p>Humidity: <span id="humidity"></span></p>
+                    <p>Air Quality: <span id="air-quality"></span></p>
+                    <p>UV Index: <span id="uv-index"></span></p>
                 </div>
-            </div>
-        </div>
+            </section>
+
+            <section id="forecast" class="animated-section">
+                <h2>Forecast</h2>
+                <div class="chart-container">
+                    <canvas id="rain-chart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="sun-chart"></canvas>
+                </div>
+            </section>
+
+            <section id="location" class="animated-section">
+                <h2>Location</h2>
+                <div id="map"></div>
+            </section>
+
+            <section id="ai-summary" class="animated-section">
+                <h2>AI Summary</h2>
+                <p id="summary"></p>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 Retro Weather</p>
+        </footer>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
