@@ -22,19 +22,6 @@ let marker;
 let temperatureChart;
 let humidityChart;
 
-function initMap(lat, lon) {
-    if (map) {
-        map.remove();
-    }
-    map = L.map('map').setView([lat, lon], 10);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
-    }).addTo(map);
-
-    marker = L.marker([lat, lon]).addTo(map);
-}
-
-
 async function getWeatherData(city) {
     try {
         const currentWeatherResponse = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=fr`);
@@ -116,8 +103,6 @@ function displayWeatherData(weatherData) {
     description.textContent = `Description: ${weatherData.current.weather[0].description}`;
     humidity.textContent = `Humidité: ${weatherData.current.main.humidity}%`;
     windSpeed.textContent = `Vitesse du vent: ${weatherData.current.wind.speed} m/s`;
-
-    initMap(weatherData.current.coord.lat, weatherData.current.coord.lon);
 
     // Handle forecast data
     if (weatherData.forecast) {
@@ -261,6 +246,48 @@ geminiButton.addEventListener('click', async () => {
         await getGeminiSummary(weatherData);
     }
 });
+
+const locationButton = document.getElementById('location-button');
+
+locationButton.addEventListener('click', () => {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition, showError);
+    } else {
+        alert("Geolocation is not supported by this browser.");
+    }
+});
+
+async function showPosition(position) {
+    const latitude = position.coords.latitude;
+    const longitude = position.coords.longitude;
+    // Update the Google Maps embed URL
+    const mapUrl = `https://maps.google.com/maps?q=${latitude},${longitude}&t=&z=13&ie=UTF8&iwloc=&output=embed`;
+    document.getElementById('map').src = mapUrl;
+    cityName.textContent = `Latitude: ${latitude}, Longitude: ${longitude}`;
+
+    // Fetch weather data for the location
+    const weatherData = await getWeatherData(`${latitude},${longitude}`);
+    if (weatherData) {
+        displayWeatherData(weatherData);
+    }
+}
+
+function showError(error) {
+    switch (error.code) {
+        case error.PERMISSION_DENIED:
+            alert("User denied the request for Geolocation.");
+            break;
+        case error.POSITION_UNAVAILABLE:
+            alert("Location information is unavailable.");
+            break;
+        case error.TIMEOUT:
+            alert("The request to get user location timed out.");
+            break;
+        case error.UNKNOWN_ERROR:
+            alert("An unknown error occurred.");
+            break;
+    }
+}
 
 window.addEventListener('load', async () => {
     const defaultCity = 'Paris';

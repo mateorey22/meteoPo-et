@@ -320,8 +320,23 @@ h1 {
     transition: background-color 0.3s ease;
 }
 
-.search-box button:hover, .weather-info button:hover {
+.search-box button:hover, .weather-info button:hover, #location-button {
     background: #2196f3;
+}
+
+#location-button {
+    border: none;
+    border-radius: 25px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 16px;
+    margin-left: 10px;
+    padding: 15px 30px;
+    transition: background-color 0.3s ease;
+}
+
+#location-button:hover {
+    background: #0b7dda;
 }
 
 #map {
