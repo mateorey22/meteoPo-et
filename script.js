@@ -260,15 +260,28 @@ locationButton.addEventListener('click', () => {
 async function showPosition(position) {
     const latitude = position.coords.latitude;
     const longitude = position.coords.longitude;
-    // Update the Google Maps embed URL
-    const mapUrl = `https://maps.google.com/maps?q=${latitude},${longitude}&t=&z=13&ie=UTF8&iwloc=&output=embed`;
-    document.getElementById('map').src = mapUrl;
-    cityName.textContent = `Latitude: ${latitude}, Longitude: ${longitude}`;
 
-    // Fetch weather data for the location
-    const weatherData = await getWeatherData(`${latitude},${longitude}`);
-    if (weatherData) {
-        displayWeatherData(weatherData);
+    // Reverse geocoding using Nominatim API
+    try {
+        const reverseGeocodingResponse = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`);
+        const reverseGeocodingData = await reverseGeocodingResponse.json();
+
+        let city = reverseGeocodingData.address.city || reverseGeocodingData.address.town || reverseGeocodingData.address.village || 'Unknown Location';
+
+        // Update the Google Maps embed URL
+        const mapUrl = `https://maps.google.com/maps?q=${city}&t=&z=16&ie=UTF8&iwloc=&output=embed`;
+        document.getElementById('map').src = mapUrl;
+        cityName.textContent = city;
+        searchInput.value = city;
+
+        // Fetch weather data for the location
+        const weatherData = await getWeatherData(city);
+        if (weatherData) {
+            displayWeatherData(weatherData);
+        }
+    } catch (error) {
+        console.error('Error during reverse geocoding:', error);
+        cityName.textContent = `Latitude: ${latitude}, Longitude: ${longitude}`;
     }
 }
 
