@@ -96,6 +96,27 @@ async function getGeminiSummary(weatherData) {
     }
 }
 
+function getBackgroundGradient(weatherDescription) {
+    switch (weatherDescription) {
+        case 'ciel dégagé': // Sunny
+            return 'linear-gradient(to bottom, #FFD700, #FFA500)'; // Gold to orange
+        case 'nuageux': // Cloudy
+            return 'linear-gradient(to bottom, #808080, #A9A9A9)'; // Gray to dark gray
+        case 'pluie': // Rainy
+            return 'linear-gradient(to bottom, #4682B4, #778899)'; // Steel blue to light slate gray
+        case 'bruine': // Drizzle
+            return 'linear-gradient(to bottom, #ADD8E6, #B0C4DE)'; // Light blue to light steel blue
+        case 'orage': // Thunderstorm
+            return 'linear-gradient(to bottom, #4B0082, #800080)'; // Indigo to purple
+        case 'neige': // Snow
+            return 'linear-gradient(to bottom, #FFFFFF, #F0F8FF)'; // White to alice blue
+        case 'vent': // Windy
+            return 'linear-gradient(to bottom, #A0522D, #C04000)'; // Sienna to brown
+        default:
+            return 'linear-gradient(to bottom, #222, #444)'; // Default dark gradient
+    }
+}
+
 function displayWeatherData(weatherData) {
     cityName.textContent = weatherData.current.name;
     weatherIcon.src = `https://openweathermap.org/img/w/${weatherData.current.weather[0].icon}.png`;
@@ -103,6 +124,11 @@ function displayWeatherData(weatherData) {
     description.textContent = `Description: ${weatherData.current.weather[0].description}`;
     humidity.textContent = `Humidité: ${weatherData.current.main.humidity}%`;
     windSpeed.textContent = `Vitesse du vent: ${weatherData.current.wind.speed} m/s`;
+
+    // Set background gradient based on weather description
+    const weatherDescription = weatherData.current.weather[0].description;
+    const backgroundGradient = getBackgroundGradient(weatherDescription);
+    document.body.style.background = backgroundGradient;
 
     // Handle forecast data
     if (weatherData.forecast) {
