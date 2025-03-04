@@ -225,11 +225,30 @@ function displayDailyForecast(dailyData) {
 }
 
 searchButton.addEventListener('click', async () => {
-    const city = searchInput.value;
-    const weatherData = await getWeatherData(city);
+    let city = searchInput.value;
+
+    // Normalize city name
+    const normalizedCity = city.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+    const weatherData = await getWeatherData(normalizedCity);
 
     if (weatherData) {
         displayWeatherData(weatherData);
+
+        // Update the Google Maps embed URL
+        const mapUrl = `https://maps.google.com/maps?q=${normalizedCity}&t=&z=16&ie=UTF8&iwloc=&output=embed&maptype=satellite`;
+        console.log("Normalized City:", normalizedCity);
+        console.log("Map URL:", mapUrl);
+        document.getElementById('map').src = mapUrl;
+
+        cityName.textContent = city;
+        searchInput.value = city;
+
+        // Reset Gemini Summary
+        geminiSummaryText.textContent = ""; // Clear the summary
+        if (weatherData) {
+            await getGeminiSummary(weatherData);
+        }
     }
 });
 
@@ -276,20 +295,30 @@ async function showPosition(position) {
             }
         }
 
+        if (!city) {
+            cityName.textContent = "Impossible de déterminer la ville. Veuillez entrer manuellement votre emplacement.";
+            return;
+        }
+
         // Update the Google Maps embed URL
         const mapUrl = `https://maps.google.com/maps?q=${city}&t=&z=16&ie=UTF8&iwloc=&output=embed&maptype=satellite`;
         document.getElementById('map').src = mapUrl;
         cityName.textContent = city;
         searchInput.value = city;
 
+        // Normalize city name
+        const normalizedCity = city.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
         // Fetch weather data for the location
-        const weatherData = await getWeatherData(city);
+        geminiSummaryText.textContent = ""; // Clear the summary
+        const weatherData = await getWeatherData(normalizedCity);
         if (weatherData) {
             displayWeatherData(weatherData);
+            await getGeminiSummary(weatherData);
         }
     } catch (error) {
         console.error('Error during reverse geocoding:', error);
-        cityName.textContent = `Latitude: ${latitude}, Longitude: ${longitude}`;
+        cityName.textContent = "Impossible de déterminer la ville. Veuillez réessayer ou entrer manuellement votre emplacement.";
     }
 }
 
