@@ -341,7 +341,18 @@ function handleScroll() {
 
 window.addEventListener('scroll', handleScroll);
 
-// Initial load
-window.addEventListener('load', () => {
+// Register service worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(registration => {
+        console.log('Service Worker registered: ', registration);
+      })
+      .catch(error => {
+        console.log('Service Worker registration failed: ', error);
+      });
     handleScroll();
-});
+  });
+} else {
+  console.log('Service workers are not supported.');
+}
